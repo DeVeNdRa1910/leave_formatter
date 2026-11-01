@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Copy, RotateCcw, Edit3, Check, Mail, Tag, Sparkles, Eye } from 'lucide-react'
+import { Copy, RotateCcw, Edit3, Check, Mail, Sparkles, Eye } from 'lucide-react'
 import type { GenerateEmailResponse } from '../types/leave'
 
 interface Props {
@@ -45,14 +45,12 @@ function ConfettiBurst({ active }: { active: boolean }) {
 
 export default function EmailPreview({ email, onRegenerate, onCopy, isRegenerating }: Props) {
   const [isEditing, setIsEditing] = useState(false)
-  const [editSubject, setEditSubject] = useState(email.subject)
   const [editBody, setEditBody] = useState(email.email_body)
   const [copied, setCopied] = useState(false)
   const [burst, setBurst] = useState(false)
 
   function handleCopy() {
-    const full = `Subject: ${editSubject}\n\n${editBody}`
-    onCopy(full)
+    onCopy(editBody)
     setCopied(true)
     setBurst(true)
     setTimeout(() => setCopied(false), 3000)
@@ -163,27 +161,6 @@ export default function EmailPreview({ email, onRegenerate, onCopy, isRegenerati
               </AnimatePresence>
               {copied ? 'Copied!' : 'Copy Email'}
             </motion.button>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Subject line ── */}
-      <div className="border-b border-[#161616] px-6 py-4">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#FF7900]/10">
-            <Tag size={11} className="text-[#FF7900]" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#333]">Subject</span>
-            {isEditing ? (
-              <input
-                value={editSubject}
-                onChange={(e) => setEditSubject(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-[#222] bg-[#141414] px-4 py-2.5 text-sm font-semibold text-white outline-none transition-colors focus:border-[#FF7900] focus:ring-2 focus:ring-[#FF7900]/10"
-              />
-            ) : (
-              <p className="mt-1 text-sm font-semibold text-white leading-snug">{editSubject}</p>
-            )}
           </div>
         </div>
       </div>
