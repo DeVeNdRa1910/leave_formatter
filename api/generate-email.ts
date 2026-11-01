@@ -9,6 +9,8 @@ interface EmailRequest {
   leave_type?: string
   project_name: string
   additional_notes?: string
+  name: string
+  salutation: string
 }
 
 const LEAVE_SYSTEM_PROMPT = `You are an experienced corporate communication assistant for Thoughtwin IT Solutions.
@@ -17,7 +19,7 @@ Your task is to generate professional, polite, concise, and natural leave reques
 
 Rules:
 1. Write a professional subject line.
-2. Address the manager respectfully (use "Dear Manager," or "Dear [Manager's Name],").
+2. Use the EXACT opening salutation provided in the prompt (e.g. "Dear Manager,", "Hello Sir,", "Hello Ma'am,").
 3. Mention the requested leave dates clearly.
 4. Mention the reason naturally without over-explaining.
 5. Include the leave category (Casual Leave, Sick Leave, etc.).
@@ -27,7 +29,7 @@ Rules:
 9. Do not invent information.
 10. Keep the email concise and human-like.
 11. Include a polite approval request.
-12. End with "Regards," and a placeholder like "[Your Name]".
+12. End with "Regards," followed by the exact name provided in the prompt — never use "[Your Name]".
 
 IMPORTANT: Respond ONLY with valid JSON in this exact format:
 {"subject": "...", "email_body": "..."}
@@ -40,7 +42,7 @@ Your task is to generate professional Work From Home request emails.
 
 Rules:
 1. Generate a clear, professional subject line.
-2. Address the manager respectfully.
+2. Use the EXACT opening salutation provided in the prompt (e.g. "Dear Manager,", "Hello Sir,", "Hello Ma'am,").
 3. Mention the WFH dates clearly.
 4. Explain the reason naturally and concisely.
 5. Mention the project name.
@@ -49,7 +51,7 @@ Rules:
 8. Keep the email short and professional.
 9. Do not invent any commitments or information.
 10. Politely request approval.
-11. End with "Regards," and a placeholder like "[Your Name]".
+11. End with "Regards," followed by the exact name provided in the prompt — never use "[Your Name]".
 
 IMPORTANT: Respond ONLY with valid JSON in this exact format:
 {"subject": "...", "email_body": "..."}
@@ -61,21 +63,27 @@ function buildUserPrompt(req: EmailRequest): string {
     ? `on ${req.date_from}`
     : `from ${req.date_from} to ${req.date_to}`
 
+  const salutation = req.salutation || 'Dear Manager'
+  const name = req.name || '[Your Name]'
+
   if (req.request_type === 'leave') {
     return `Generate a leave request email with these details:
+- Opening salutation: "${salutation},"
 - Leave dates: ${dateRange}
 - Leave type: ${req.leave_type || 'Casual Leave'}
 - Reason: ${req.reason}
 - Project name: ${req.project_name}
+- Sign off with the name: ${name}
 
 Return only the JSON response.`
   }
 
   return `Generate a Work From Home request email with these details:
+- Opening salutation: "${salutation},"
 - WFH dates: ${dateRange}
 - Reason: ${req.reason}
 - Project name: ${req.project_name}
-${req.additional_notes ? `- Additional notes: ${req.additional_notes}` : ''}
+${req.additional_notes ? `- Additional notes: ${req.additional_notes}` : ''}- Sign off with the name: ${name}
 
 Return only the JSON response.`
 }
